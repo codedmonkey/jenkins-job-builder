@@ -13,7 +13,8 @@ class ShellBuilderDumper
     {
         $node = $dom->createElement('hudson.tasks.Shell');
 
-        $commandNode = $dom->createElement('command', $builder->getCommand());
+        $commandNode = $dom->createElement('command');
+        $commandNode->appendChild($dom->createTextNode($builder->getCommand()));
         $node->appendChild($commandNode);
 
         return $node;

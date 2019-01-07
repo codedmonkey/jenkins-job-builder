@@ -48,7 +48,8 @@ class ParameterizedTriggerPublisherDumper
             $predefinedParametersNode = $dom->createElement('hudson.plugins.parameterizedtrigger.PredefinedBuildParameters');
             $configsNode->appendChild($predefinedParametersNode);
 
-            $predefinedParametersPropertiesNode = $dom->createElement('properties', $predefinedParameters);
+            $predefinedParametersPropertiesNode = $dom->createElement('properties');
+            $predefinedParametersPropertiesNode->appendChild($dom->createTextNode($predefinedParameters));
             $predefinedParametersNode->appendChild($predefinedParametersPropertiesNode);
 
             // todo make configurable

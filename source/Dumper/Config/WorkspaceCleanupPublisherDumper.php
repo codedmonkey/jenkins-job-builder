@@ -31,10 +31,12 @@ class WorkspaceCleanupPublisherDumper
                 $patternNode = $dom->createElement('hudson.plugins.ws__cleanup.Pattern');
                 $patternsNode->appendChild($patternNode);
 
-                $patternTextNode = $dom->createElement('pattern', $pattern[0]);
+                $patternTextNode = $dom->createElement('pattern');
+                $patternTextNode->appendChild($dom->createTextNode($pattern[0]));
                 $patternNode->appendChild($patternTextNode);
 
-                $patternTypeNode = $dom->createElement('type', strtoupper($pattern[1]));
+                $patternTypeNode = $dom->createElement('type');
+                $patternTypeNode->appendChild($dom->createTextNode(strtoupper($pattern[1])));
                 $patternNode->appendChild($patternTypeNode);
             }
         }
@@ -67,7 +69,8 @@ class WorkspaceCleanupPublisherDumper
         $cleanupParentNode = $dom->createElement('cleanupMatrixParent', $publisher->getCleanupParent() ? 'true' : 'false');
         $node->appendChild($cleanupParentNode);
 
-        $externalCommandNode = $dom->createElement('externalDelete', $publisher->getExternalCommand());
+        $externalCommandNode = $dom->createElement('externalDelete');
+        $externalCommandNode->appendChild($dom->createTextNode($publisher->getExternalCommand()));
         $node->appendChild($externalCommandNode);
 
         $deferredWipeoutNode = $dom->createElement('deferredWipeout', $publisher->getDeferredWipeout() ? 'true' : 'false');

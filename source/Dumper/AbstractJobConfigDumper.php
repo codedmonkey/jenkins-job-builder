@@ -64,7 +64,10 @@ abstract class AbstractJobConfigDumper
 
     public function buildDescriptionNode(?string $description): void
     {
-        $node = $this->dom->createElement('description', $description);
+        $node = $this->dom->createElement('description');
+        if ($description) {
+            $node->appendChild($this->dom->createTextNode($description));
+        }
         $this->rootNode->appendChild($node);
     }
 
@@ -74,7 +77,8 @@ abstract class AbstractJobConfigDumper
             return;
         }
 
-        $node = $this->dom->createElement('displayName', $displayName);
+        $node = $this->dom->createElement('displayName');
+        $node->appendChild($this->dom->createTextNode($displayName));
         $this->rootNode->appendChild($node);
     }
 

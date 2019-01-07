@@ -14,7 +14,8 @@ class TriggerPublisherDumper
     {
         $node = $dom->createElement('hudson.tasks.BuildTrigger');
 
-        $projectsNode = $dom->createElement('childProjects', $publisher->getJob());
+        $projectsNode = $dom->createElement('childProjects');
+        $projectsNode->appendChild($dom->createTextNode($publisher->getJob()));
         $node->appendChild($projectsNode);
 
         $thresholdValues = $this->getThresholdValues($publisher->getThreshold());

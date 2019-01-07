@@ -13,7 +13,8 @@ class TimedTriggerDumper
     {
         $node = $dom->createElement('hudson.triggers.TimerTrigger');
 
-        $specificationNode = $dom->createElement('spec', $trigger->getCron());
+        $specificationNode = $dom->createElement('spec');
+        $specificationNode->appendChild($dom->createTextNode($trigger->getCron()));
         $node->appendChild($specificationNode);
 
         return $node;
