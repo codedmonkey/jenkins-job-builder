@@ -18,11 +18,15 @@ abstract class AbstractParameterDumper
         $node->appendChild($nameNode);
 
         $descriptionNode = $dom->createElement('description');
-        $descriptionNode->appendChild($dom->createTextNode($parameter->getDescription()));
+        if ('' != $parameter->getDescription()) {
+            $descriptionNode->appendChild($dom->createTextNode($parameter->getDescription()));
+        }
         $node->appendChild($descriptionNode);
 
         $defaultNode = $dom->createElement('defaultValue');
-        $defaultNode->appendChild($dom->createTextNode($this->dumpDefaultValue($parameter->getDefaultValue())));
+        if ('' !== $defaultValue = $this->dumpDefaultValue($parameter->getDefaultValue())) {
+            $defaultNode->appendChild($dom->createTextNode($defaultValue));
+        }
         $node->appendChild($defaultNode);
 
         return $node;

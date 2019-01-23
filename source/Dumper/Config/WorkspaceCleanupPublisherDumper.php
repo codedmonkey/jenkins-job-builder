@@ -70,7 +70,9 @@ class WorkspaceCleanupPublisherDumper
         $node->appendChild($cleanupParentNode);
 
         $externalCommandNode = $dom->createElement('externalDelete');
-        $externalCommandNode->appendChild($dom->createTextNode($publisher->getExternalCommand()));
+        if ('' != $publisher->getExternalCommand()) {
+            $externalCommandNode->appendChild($dom->createTextNode($publisher->getExternalCommand()));
+        }
         $node->appendChild($externalCommandNode);
 
         $deferredWipeoutNode = $dom->createElement('deferredWipeout', $publisher->getDeferredWipeout() ? 'true' : 'false');
