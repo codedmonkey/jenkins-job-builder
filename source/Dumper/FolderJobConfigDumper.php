@@ -34,6 +34,11 @@ class FolderJobConfigDumper extends AbstractJobConfigDumper
 
     }
 
+    public function buildSourceControlManagementNode(): void
+    {
+
+    }
+
     public function buildCanRoamNode(): void
     {
 
