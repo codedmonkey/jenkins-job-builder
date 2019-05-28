@@ -5,25 +5,25 @@
 
 namespace CodedMonkey\Jenkins\Builder\Dumper\Config;
 
-use CodedMonkey\Jenkins\Builder\Config\ParameterizedTriggerPublisher;
-use CodedMonkey\Jenkins\Builder\Config\ParameterizedTriggersPublisher;
+use CodedMonkey\Jenkins\Builder\Config\ParameterizedTriggerBuilder;
+use CodedMonkey\Jenkins\Builder\Config\ParameterizedTriggersBuilder;
 use CodedMonkey\Jenkins\Builder\Exception\BuilderException;
 
-class ParameterizedTriggerPublisherDumper
+class ParameterizedTriggerBuilderDumper
 {
-    public function dump(\DOMDocument $dom, $publisher)
+    public function dump(\DOMDocument $dom, $builder)
     {
-        if (!$publisher instanceof ParameterizedTriggerPublisher && !$publisher instanceof ParameterizedTriggersPublisher) {
-            throw new BuilderException(sprintf('Invalid publisher class: %s', get_class($publisher)));
+        if (!$builder instanceof ParameterizedTriggerBuilder && !$builder instanceof ParameterizedTriggersBuilder) {
+            throw new BuilderException(sprintf('Invalid builder class: %s', get_class($builder)));
         }
 
-        $node = $dom->createElement('hudson.plugins.parameterizedtrigger.BuildTrigger');
+        $node = $dom->createElement('hudson.plugins.parameterizedtrigger.TriggerBuilder');
         $node->setAttribute('plugin', 'parameterized-trigger');
 
         $configsNode = $dom->createElement('configs');
         $node->appendChild($configsNode);
 
-        $triggers = $publisher instanceof ParameterizedTriggerPublisher ? [$publisher] : $publisher->getTriggers();
+        $triggers = $builder instanceof ParameterizedTriggerBuilder ? [$builder] : $builder->getTriggers();
 
         foreach ($triggers as $trigger) {
             $triggerNode = $this->dumpTrigger($dom, $trigger);
@@ -33,9 +33,9 @@ class ParameterizedTriggerPublisherDumper
         return $node;
     }
 
-    public function dumpTrigger(\DOMDocument $dom, ParameterizedTriggerPublisher $trigger): \DOMElement
+    public function dumpTrigger(\DOMDocument $dom, ParameterizedTriggerBuilder $trigger): \DOMElement
     {
-        $node = $dom->createElement('hudson.plugins.parameterizedtrigger.BuildTriggerConfig');
+        $node = $dom->createElement('hudson.plugins.parameterizedtrigger.BlockableBuildTriggerConfig');
 
         $configsNode = $dom->createElement('configs');
         $node->appendChild($configsNode);
@@ -101,6 +101,71 @@ class ParameterizedTriggerPublisherDumper
         $fromChildProjectsNode = $dom->createElement('triggerFromChildProjects', $trigger->getTriggerFromChildProjects() ? 'true' : 'false');
         $node->appendChild($fromChildProjectsNode);
 
+        if ($trigger->getBlockProject()) {
+            $blockNode = $dom->createElement('block');
+            $node->appendChild($blockNode);
+
+            $thresholds = $trigger->getBlockProjectThresholds();
+
+            if (null !== $buildStepFailureThreshold = ($thresholds['buildStepFailure'] ?? null)) {
+                $buildStepFailureThresholdNode = $dom->createElement('buildStepFailureThreshold');
+                $blockNode->appendChild($buildStepFailureThresholdNode);
+
+                $this->fillBlockThresholdNode($dom, $buildStepFailureThresholdNode, $buildStepFailureThreshold);
+            }
+
+            if (null !== $unstableThreshold = ($thresholds['unstable'] ?? null)) {
+                $unstableThresholdNode = $dom->createElement('unstableThreshold');
+                $blockNode->appendChild($unstableThresholdNode);
+
+                $this->fillBlockThresholdNode($dom, $unstableThresholdNode, $unstableThreshold);
+            }
+
+            if (null !== $failureThreshold = ($thresholds['failure'] ?? null)) {
+                $failureThresholdNode = $dom->createElement('failureThreshold');
+                $blockNode->appendChild($failureThresholdNode);
+
+                $this->fillBlockThresholdNode($dom, $failureThresholdNode, $failureThreshold);
+            }
+        }
+
+        // todo make configurable
+        $buildWithLabelsNode =  $dom->createElement('buildAllNodesWithLabel', 'false');
+        $node->appendChild($buildWithLabelsNode);
+
         return $node;
+    }
+
+    private function fillBlockThresholdNode(\DOMDocument $dom, \DOMElement $thresholdNode, ?string $threshold): void
+    {
+        static $thresholdParameters = [
+            'SUCCESS' => [
+                'ordinal' => 0,
+                'color' => 'BLUE',
+                'completeBuild' => true,
+            ],
+            'FAILURE' => [
+                'ordinal' => 2,
+                'color' => 'RED',
+                'completeBuild' => true,
+            ],
+            'UNSTABLE' => [
+                'ordinal' => 1,
+                'color' => 'YELLOW',
+                'completeBuild' => true,
+            ],
+        ];
+
+        $nameNode = $dom->createElement('name', $threshold);
+        $thresholdNode->appendChild($nameNode);
+
+        $ordinalNode = $dom->createElement('ordinal', $thresholdParameters[$threshold]['ordinal']);
+        $thresholdNode->appendChild($ordinalNode);
+
+        $colorNode = $dom->createElement('color', $thresholdParameters[$threshold]['color']);
+        $thresholdNode->appendChild($colorNode);
+
+        $completeBuildNode = $dom->createElement('completeBuild', $thresholdParameters[$threshold]['completeBuild'] ? 'true' : 'false');
+        $thresholdNode->appendChild($completeBuildNode);
     }
 }

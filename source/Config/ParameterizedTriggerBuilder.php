@@ -5,7 +5,7 @@
 
 namespace CodedMonkey\Jenkins\Builder\Config;
 
-class ParameterizedTriggerPublisher implements PublisherInterface
+class ParameterizedTriggerBuilder implements BuilderInterface
 {
     private $jobs;
     private $booleanParameters = [];
@@ -15,6 +15,8 @@ class ParameterizedTriggerPublisher implements PublisherInterface
     private $condition = 'SUCCESS';
     private $triggerWithNoParameters = false;
     private $triggerFromChildProjects = false;
+    private $blockProject = false;
+    private $blockProjectThresholds = [];
 
     public function getJobs(): array
     {
@@ -54,7 +56,7 @@ class ParameterizedTriggerPublisher implements PublisherInterface
     }
 
     /**
-     * Sets parameters to pass to the triggered jobs
+     * Sets predefined parameters to pass to the triggered jobs
      */
     public function setPredefinedParameters(array $predefinedParameters): self
     {
@@ -135,6 +137,41 @@ class ParameterizedTriggerPublisher implements PublisherInterface
     public function setTriggerFromChildProjects(bool $triggerFromChildProjects): self
     {
         $this->triggerFromChildProjects = $triggerFromChildProjects;
+
+        return $this;
+    }
+
+    public function getBlockProject(): bool
+    {
+        return $this->blockProject;
+    }
+
+    /**
+     * Sets whether the current project is blocked by the triggered project.
+     */
+    public function setBlockProject(bool $blockProject): self
+    {
+        $this->blockProject = $blockProject;
+
+        return $this;
+    }
+
+    public function getBlockProjectThresholds(): array
+    {
+        return $this->blockProjectThresholds;
+    }
+
+    /**
+     * Sets the thresholds for when the triggered project blocks the current
+     * project: SUCCESS, UNSTABLE, FAILURE or `null` for never (defaults to `null`)
+     */
+    public function setBlockProjectThresholds(string $buildStepFailureThreshold = null, string $unstableThreshold = null, string $failureThreshold = null): self
+    {
+        $this->blockProjectThresholds = [
+            'buildStepFailure' => $buildStepFailureThreshold,
+            'unstable' => $unstableThreshold,
+            'failure' => $failureThreshold,
+        ];
 
         return $this;
     }

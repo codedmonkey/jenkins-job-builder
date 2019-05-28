@@ -8,7 +8,9 @@ namespace CodedMonkey\Jenkins\Builder\Dumper;
 use CodedMonkey\Jenkins\Builder\Config\BooleanParameter;
 use CodedMonkey\Jenkins\Builder\Config\BuilderInterface;
 use CodedMonkey\Jenkins\Builder\Config\ParameterInterface;
+use CodedMonkey\Jenkins\Builder\Config\ParameterizedTriggerBuilder;
 use CodedMonkey\Jenkins\Builder\Config\ParameterizedTriggerPublisher;
+use CodedMonkey\Jenkins\Builder\Config\ParameterizedTriggersBuilder;
 use CodedMonkey\Jenkins\Builder\Config\ParameterizedTriggersPublisher;
 use CodedMonkey\Jenkins\Builder\Config\PasswordParameter;
 use CodedMonkey\Jenkins\Builder\Config\PublisherInterface;
@@ -20,6 +22,7 @@ use CodedMonkey\Jenkins\Builder\Config\TriggerPublisher;
 use CodedMonkey\Jenkins\Builder\Config\WorkspaceCleanupPublisher;
 use CodedMonkey\Jenkins\Builder\Dumper\Config\AbstractParameterDumper;
 use CodedMonkey\Jenkins\Builder\Dumper\Config\BooleanParameterDumper;
+use CodedMonkey\Jenkins\Builder\Dumper\Config\ParameterizedTriggerBuilderDumper;
 use CodedMonkey\Jenkins\Builder\Dumper\Config\ParameterizedTriggerPublisherDumper;
 use CodedMonkey\Jenkins\Builder\Dumper\Config\PasswordParameterDumper;
 use CodedMonkey\Jenkins\Builder\Dumper\Config\ShellBuilderDumper;
@@ -213,6 +216,8 @@ abstract class AbstractJobConfigDumper
     public function buildBuilderNode(\DOMElement $parent, BuilderInterface $builder): void
     {
         static $dumperClasses = [
+            ParameterizedTriggersBuilder::class => ParameterizedTriggerBuilderDumper::class,
+            ParameterizedTriggerBuilder::class => ParameterizedTriggerBuilderDumper::class,
             ShellBuilder::class => ShellBuilderDumper::class,
         ];
 
