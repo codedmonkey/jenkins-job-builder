@@ -33,11 +33,26 @@ class JobConfigBuilder
     private $builders = [];
     private $publishers = [];
 
+    public function __construct(string $type = self::TYPE_FREESTYLE)
+    {
+        $this->type = $type;
+    }
+
+    public function getType(): string
+    {
+        return $this->type;
+    }
+
     public function setType(string $type): self
     {
         $this->type = $type;
 
         return $this;
+    }
+
+    public function getDisplayName(): ?string
+    {
+        return $this->displayName;
     }
 
     public function setDisplayName(?string $displayName): self
@@ -47,6 +62,11 @@ class JobConfigBuilder
         return $this;
     }
 
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
     public function setDescription(?string $description): self
     {
         $this->description = $description;
@@ -54,11 +74,21 @@ class JobConfigBuilder
         return $this;
     }
 
+    public function getDisabled(): bool
+    {
+        return $this->disabled;
+    }
+
     public function setDisabled(bool $disabled): self
     {
         $this->disabled = $disabled;
 
         return $this;
+    }
+
+    public function getParameters(): array
+    {
+        return $this->parameters;
     }
 
     public function addParameter(string $name, string $type = 'string', $defaultValue = null, ?string $description = null): self
@@ -87,12 +117,22 @@ class JobConfigBuilder
         return $this;
     }
 
+    public function getTriggers(): array
+    {
+        return $this->triggers;
+    }
+
     public function addTimedTrigger(string $cron): self
     {
         $this->triggers[] = (new TimedTrigger())
             ->setCron($cron);
 
         return $this;
+    }
+
+    public function getBuilders(): array
+    {
+        return $this->builders;
     }
 
     public function addBuilder(BuilderInterface $builder): self
@@ -112,14 +152,19 @@ class JobConfigBuilder
         return $this;
     }
 
-    public function addPublisher(PublisherInterface $publisher)
+    public function getPublishers(): array
+    {
+        return $this->publishers;
+    }
+
+    public function addPublisher(PublisherInterface $publisher): self
     {
         $this->publishers[] = $publisher;
 
         return $this;
     }
 
-    public function buildConfig()
+    public function buildConfig(): string
     {
         static $typeMap = [
             self::TYPE_FREESTYLE => FreestyleJobConfigDumper::class,
